@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Task Mode</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #1e1e2f;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      height: 100vh;
+      padding-top: 50px;
+    }
+
+    h1 {
+      font-size: 48px;
+      margin-bottom: 30px;
+    }
+    #taskInputSection {
+  transition: all 0.3s ease;
+}
+
+    .btn {
+      background-color: #3e8ed0;
+      color: white;
+      padding: 15px 30px;
+      font-size: 18px;
+      margin: 10px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn:hover {
+      background-color: #5ea1de;
+    }
+
+    .back {
+      margin-top: 20px;
+      background-color: #555;
+    }
+
+    .task-list {
+      width: 80%;
+      max-width: 600px;
+      margin-top: 30px;
+      text-align: left;
+    }
+
+    .task-item {
+      background: #2e2e40;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 8px;
+    }
+    .container {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+  gap: 50px;
+  padding: 20px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.left-panel, .right-panel {
+  flex: 1;
+  max-width: 500px;
+}
+
+.left-panel {
+  background-color: #2a2a3c;
+  padding: 20px;
+  border-radius: 12px;
+  min-height: 300px;
+}
+
+.right-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.large-btn {
+  height: 100px;
+  font-size: 20px;
+}
+
+.input-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.input-panel input {
+  padding: 8px 12px;
+  font-size: 16px;
+  height: 30px;
+  border-radius: 6px;
+  border: 2px solid #3e8ed0;
+  background-color: #87b9de;  /* light blue background */
+  color: white;
+}
+
+.input-panel input::placeholder {
+  color: #e0e0e0;
+  opacity: 1;
+}
+
+
+.small-btn {
+  height: 40px;
+  font-size: 16px;
+  padding: 8px 16px;
+  background-color: #3e8ed0;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.small-btn:hover {
+  background-color: #5ea1de;
+}
+
+.small-btn {
+  font-size: 14px;
+  padding: 8px 16px;
+  margin: 10px 6px 0 0;
+  background-color: #3e8ed0;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.small-btn:hover {
+  background-color: #5ea1de;
+}
+
+@media screen and (max-width: 768px) {
+  .container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .left-panel, .right-panel {
+    width: 90%;
+    max-width: none;
+  }
+}
+
+  </style>
+</head>
+<body>
+  <h1>Task Mode</h1>
+
+  <div class="container">
+    <!-- Left Panel -->
+    <div class="left-panel">
+      <h3>Current Task</h3>
+      <div id="currentTask"><em>Loading...</em></div>
+      <div id="stopwatch" style="font-size: 24px; margin: 10px 0;"></div>
+      <hr />
+      <h3>Tasks</h3>
+      <div id="tasks">No Tasks Yet</div>
+    </div>
+
+    <!-- Right Panel -->
+    <div class="right-panel">
+        <!-- Start Task Large Button -->
+<button class="btn large-btn" id="startBtn" onclick="showStartForm()">🟢 Start Task</button>
+
+<!-- Start Task Form (hidden initially) -->
+<div id="startForm" class="input-panel" style="display: none;">
+  <input type="text" id="taskInput" placeholder="Task name" />
+  <input type="text" id="taskTimer" placeholder="(Optional) Time limit (e.g. 00:30:00)" />
+  <button class="btn small-btn" onclick="confirmStartTask()">✅ Confirm Start</button>
+</div>
+
+<!-- Schedule Task Large Button -->
+<button class="btn large-btn" id="scheduleBtn" onclick="showScheduleForm()">📅 Schedule Task</button>
+
+<!-- Schedule Task Form (hidden initially) -->
+<div id="scheduleForm" class="input-panel" style="display: none;">
+  <input type="text" id="scheduleName" placeholder="Task name" />
+  <input type="date" id="scheduleDate" />
+  <input type="time" id="scheduleTime" />
+  <button class="btn small-btn" onclick="confirmScheduleTask()">📌 Confirm Schedule</button>
+</div>
+
+<!-- Back Button -->
+<button class="btn back" onclick="goBack()">🔙 Back to Home</button>
+
+    </div>
+  </div>
+
+  <script>
+  let currentTask = JSON.parse(localStorage.getItem("currentTask"));
+  let stopwatchInterval;
+
+
+  function goBack() {
+    window.location.href = "index.html";
+  }
+
+  function startTask() {
+  document.getElementById("taskInputSection").style.display = "block";
+}
+function confirmStartTask() {
+  const name = document.getElementById("taskInput").value.trim();
+  if (!name) {
+    alert("Please enter a task name.");
+    return;
+  }
+
+  const now = new Date();
+  currentTask = {
+    name,
+    startTime: now.toISOString(),
+    status: "Running",
+    log: []
+  };
+
+  document.getElementById("taskInputSection").style.display = "none";
+  document.getElementById("taskInput").value = "";
+  saveCurrentTask();
+}
+
+
+  function scheduleTask() {
+    const name = prompt("Enter task name:");
+    const time = prompt("Enter scheduled time (HH:MM):");
+    const date = prompt("Enter date (YYYY-MM-DD):");
+    if (!name || !time || !date) return;
+
+    const taskObj = {
+      name,
+      time: `${date} ${time}`,
+      type: "Scheduled"
+    };
+
+    let tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
+    tasks.push(taskObj);
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+    displayTasks();
+  }
+
+  function pauseTask() {
+    if (!currentTask || currentTask.status !== "Running") return;
+    currentTask.status = "Paused";
+    currentTask.pauseTime = new Date().toISOString();
+    saveCurrentTask();
+  }
+
+  function resumeTask() {
+    if (!currentTask || currentTask.status !== "Paused") return;
+    currentTask.status = "Running";
+    currentTask.resumeTime = new Date().toISOString();
+    saveCurrentTask();
+  }
+
+  function endTask() {
+    if (!currentTask) return;
+    currentTask.status = "Ended";
+    currentTask.endTime = new Date().toISOString();
+
+    // Save to history
+    let tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
+    tasks.push(currentTask);
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+
+    // Clear current
+    localStorage.removeItem("currentTask");
+    currentTask = null;
+
+    displayTasks();
+    displayCurrentTask();
+  }
+
+  function saveCurrentTask() {
+    localStorage.setItem("currentTask", JSON.stringify(currentTask));
+    displayCurrentTask();
+  }
+function displayCurrentTask() {
+  const taskDiv = document.getElementById("currentTask");
+  const sw = document.getElementById("stopwatch");
+  clearInterval(stopwatchInterval);
+  sw.textContent = "";
+
+  if (!currentTask || currentTask.status === "Ended") {
+    taskDiv.innerHTML = "<em>No task running</em>";
+    return;
+  }
+
+  let html = `<div class="task-item">
+    <strong>${currentTask.name}</strong><br/>
+    Status: ${currentTask.status}<br/>
+    Started at: ${new Date(currentTask.startTime).toLocaleTimeString()}<br/>
+  </div>`;
+
+  // Add pause/resume/end buttons conditionally
+  if (currentTask.status === "Running") {
+    html += `
+      <button class="btn small-btn" onclick="pauseTask()">⏸ Pause</button>
+      <button class="btn small-btn" onclick="endTask()">🛑 End</button>
+    `;
+  } else if (currentTask.status === "Paused") {
+    html += `
+      <button class="btn small-btn" onclick="resumeTask()">▶ Resume</button>
+      <button class="btn small-btn" onclick="endTask()">🛑 End</button>
+    `;
+  }
+
+  taskDiv.innerHTML = html;
+  if (currentTask.status === "Running") {
+    startStopwatch();
+  }
+}
+
+  
+  function displayTasks() {
+    let tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
+    const taskDiv = document.getElementById("tasks");
+    if (tasks.length === 0) {
+      taskDiv.innerHTML = "No Tasks Yet";
+      return;
+    }
+
+    taskDiv.innerHTML = tasks.map(t =>
+      `<div class="task-item">
+        <strong>${t.name}</strong><br/>
+        ${t.type ? `Scheduled for: ${t.time}` : `Status: ${t.status}<br/>Start: ${new Date(t.startTime).toLocaleTimeString()}<br/>End: ${t.endTime ? new Date(t.endTime).toLocaleTimeString() : '—'}`}
+      </div>`).join("");
+  }
+  function startStopwatch() {
+  const sw = document.getElementById("stopwatch");
+  let start = new Date(currentTask.startTime);
+  let resume = currentTask.resumeTime ? new Date(currentTask.resumeTime) : null;
+  let pause = currentTask.pauseTime ? new Date(currentTask.pauseTime) : null;
+
+  // Time lost to pauses
+  let totalPaused = 0;
+
+  if (pause && resume) {
+    totalPaused += resume - pause;
+  }
+
+  stopwatchInterval = setInterval(() => {
+    let now = new Date();
+    let elapsed = now - start - totalPaused;
+
+    // Format HH:MM:SS
+    let seconds = Math.floor(elapsed / 1000) % 60;
+    let minutes = Math.floor(elapsed / (1000 * 60)) % 60;
+    let hours = Math.floor(elapsed / (1000 * 60 * 60));
+
+    sw.textContent = `⏱ Time: ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  }, 1000);
+}
+function showStartForm() {
+  document.getElementById("startBtn").style.display = "none";
+  document.getElementById("startForm").style.display = "flex";
+}
+
+function showScheduleForm() {
+  document.getElementById("scheduleBtn").style.display = "none";
+  document.getElementById("scheduleForm").style.display = "flex";
+}
+
+function confirmStartTask() {
+  const name = document.getElementById("taskInput").value.trim();
+  const timer = document.getElementById("taskTimer").value.trim();
+  if (!name) return alert("Enter task name");
+
+  const now = new Date();
+  currentTask = {
+    name,
+    startTime: now.toISOString(),
+    status: "Running",
+    timeLimit: timer || null
+  };
+
+  document.getElementById("startForm").style.display = "none";
+  saveCurrentTask();
+}
+
+function confirmScheduleTask() {
+  const name = document.getElementById("scheduleName").value.trim();
+  const date = document.getElementById("scheduleDate").value;
+  const time = document.getElementById("scheduleTime").value;
+  if (!name || !date || !time) return alert("Fill all fields");
+
+  const taskObj = {
+    name,
+    time: `${date} ${time}`,
+    type: "Scheduled"
+  };
+
+  let tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
+  tasks.push(taskObj);
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+
+  document.getElementById("scheduleForm").style.display = "none";
+  displayTasks();
+}
+
+
+  // Initial setup
+  displayTasks();
+  displayCurrentTask();
+</script>
+
+</body>
+</html>

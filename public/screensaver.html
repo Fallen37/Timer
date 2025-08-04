@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Screensaver Mode</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #1e1e2f;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    h1 {
+      font-size: 48px;
+      margin-bottom: 40px;
+    }
+
+    .btn {
+      background-color: #3e8ed0;
+      color: white;
+      padding: 15px 30px;
+      font-size: 18px;
+      margin: 12px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn:hover {
+      background-color: #5ea1de;
+    }
+
+    .back {
+      margin-top: 40px;
+      background-color: #555;
+    }
+
+    .back:hover {
+      background-color: #777;
+    }
+  </style>
+</head>
+<body>
+  <h1>Screensaver Mode</h1>
+
+  <button class="btn" onclick="selectMusic()">🎵 Select Music Album</button>
+  <button class="btn" onclick="selectPictures()">🖼 Select Picture Album</button>
+  <button class="btn back" onclick="goBack()">🔙 Back to Home</button>
+
+  <script>
+    function goBack() {
+      window.location.href = "index.html";
+    }
+
+    function selectMusic() {
+      alert("Music selection not yet implemented.");
+    }
+
+    function selectPictures() {
+      alert("Picture album selection not yet implemented.");
+    }
+  </script>
+</body>
+</html>
