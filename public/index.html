@@ -1,0 +1,71 @@
+<!-- public/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Focus Screensaver</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; padding: 2rem; background: #f4f4f4; }
+    .btn { margin: 10px; padding: 10px 20px; font-size: 16px; }
+    #taskDisplay { margin-top: 20px; font-size: 20px; }
+  </style>
+</head>
+<body>
+  <h1>🎯 Current Task Tracker</h1>
+  <input type="text" id="taskInput" placeholder="Enter task name" />
+  <div>
+    <button class="btn" onclick="startTask()">Start Task</button>
+    <button class="btn" onclick="pauseTask()">Pause Task</button>
+    <button class="btn" onclick="resumeTask()">Resume</button>
+    <button class="btn" onclick="endTask()">End Task</button>
+  </div>
+
+  <div id="taskDisplay"></div>
+
+  <script>
+    let currentTask = localStorage.getItem("currentTask") || "";
+    let paused = localStorage.getItem("paused") === "true";
+
+    function updateDisplay() {
+      const display = document.getElementById("taskDisplay");
+      if (!currentTask) display.innerText = "No task in progress.";
+      else display.innerText = paused ? `⏸️ Paused: ${currentTask}` : `🟢 Working on: ${currentTask}`;
+    }
+
+    function startTask() {
+      const taskName = document.getElementById("taskInput").value.trim();
+      if (!taskName) return alert("Please enter a task.");
+      currentTask = taskName;
+      paused = false;
+      localStorage.setItem("currentTask", currentTask);
+      localStorage.setItem("paused", "false");
+      updateDisplay();
+    }
+
+    function pauseTask() {
+      if (!currentTask) return;
+      paused = true;
+      localStorage.setItem("paused", "true");
+      updateDisplay();
+    }
+
+    function resumeTask() {
+      if (!currentTask) return;
+      paused = false;
+      localStorage.setItem("paused", "false");
+      updateDisplay();
+    }
+
+    function endTask() {
+      alert(`Task "${currentTask}" ended.`);
+      currentTask = "";
+      paused = false;
+      localStorage.removeItem("currentTask");
+      localStorage.removeItem("paused");
+      updateDisplay();
+    }
+
+    updateDisplay();
+  </script>
+</body>
+</html>
