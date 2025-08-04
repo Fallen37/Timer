@@ -2,70 +2,71 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Focus Screensaver</title>
+  <meta charset="UTF-8" />
+  <title>Task Screensaver - Home</title>
   <style>
-    body { font-family: sans-serif; text-align: center; padding: 2rem; background: #f4f4f4; }
-    .btn { margin: 10px; padding: 10px 20px; font-size: 16px; }
-    #taskDisplay { margin-top: 20px; font-size: 20px; }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #1e1e2f;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    h1 {
+      font-size: 60px;
+      margin-bottom: 30px;
+    }
+
+    .clock {
+      font-size: 80px;
+      letter-spacing: 8px;
+      margin-bottom: 60px;
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    .btn {
+      background-color: #3e8ed0;
+      color: white;
+      padding: 15px 30px;
+      font-size: 20px;
+      margin: 10px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn:hover {
+      background-color: #5ea1de;
+    }
   </style>
 </head>
 <body>
-  <h1>🎯 Current Task Tracker</h1>
-  <input type="text" id="taskInput" placeholder="Enter task name" />
-  <div>
-    <button class="btn" onclick="startTask()">Start Task</button>
-    <button class="btn" onclick="pauseTask()">Pause Task</button>
-    <button class="btn" onclick="resumeTask()">Resume</button>
-    <button class="btn" onclick="endTask()">End Task</button>
-  </div>
+  <h1>Welcome</h1>
+  <div class="clock" id="clock">--:--</div>
 
-  <div id="taskDisplay"></div>
+  <button class="btn" onclick="goTo('screensaver')">Screensaver Mode</button>
+  <button class="btn" onclick="goTo('task')">Task Mode</button>
 
   <script>
-    let currentTask = localStorage.getItem("currentTask") || "";
-    let paused = localStorage.getItem("paused") === "true";
-
-    function updateDisplay() {
-      const display = document.getElementById("taskDisplay");
-      if (!currentTask) display.innerText = "No task in progress.";
-      else display.innerText = paused ? `⏸️ Paused: ${currentTask}` : `🟢 Working on: ${currentTask}`;
+    function updateClock() {
+      const clock = document.getElementById("clock");
+      const now = new Date();
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      clock.textContent = `${hours}:${minutes}`;
     }
+    setInterval(updateClock, 1000);
+    updateClock();
 
-    function startTask() {
-      const taskName = document.getElementById("taskInput").value.trim();
-      if (!taskName) return alert("Please enter a task.");
-      currentTask = taskName;
-      paused = false;
-      localStorage.setItem("currentTask", currentTask);
-      localStorage.setItem("paused", "false");
-      updateDisplay();
+    function goTo(mode) {
+      window.location.href = `${mode}.html`;
     }
-
-    function pauseTask() {
-      if (!currentTask) return;
-      paused = true;
-      localStorage.setItem("paused", "true");
-      updateDisplay();
-    }
-
-    function resumeTask() {
-      if (!currentTask) return;
-      paused = false;
-      localStorage.setItem("paused", "false");
-      updateDisplay();
-    }
-
-    function endTask() {
-      alert(`Task "${currentTask}" ended.`);
-      currentTask = "";
-      paused = false;
-      localStorage.removeItem("currentTask");
-      localStorage.removeItem("paused");
-      updateDisplay();
-    }
-
-    updateDisplay();
   </script>
 </body>
 </html>
